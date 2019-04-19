@@ -1,0 +1,59 @@
+image: docker:latest
+services:
+  - docker:dind
+cache:
+    paths:
+      - .m2/repository/
+      - target/
+variables:
+  DOCKER_DRIVER: overlay
+  SPRING_PROFILES_ACTIVE: gitlab-ci
+  MAVEN_OPTS: "-Djava.awt.headless=true -Dmaven.repo.local=./.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  USER_GITLAB: thukabjj
+  APP_NAME: spring-boot-docker-container
+  REPO: ingresse
+  
+stages:
+  - build
+  - test
+  - docker
+  
+maven-compile:
+  image: maven:latest
+  stage: build
+  script: 
+    - mvn $MAVEN_CLI_OPTS compile 
+
+  artifacts:
+    paths:
+      - target/
+
+maven-package:
+  image: maven:latest
+  stage: test
+  dependencies:
+    - maven-compile
+  script:
+    - mvn package $MAVEN_CLI_OPTS
+  artifacts:
+    paths:
+      - target/
+      
+maven-verify:
+  image: maven:latest
+  stage: test
+  dependencies:
+    - maven-compile
+  script:
+    - mvn verify $MAVEN_CLI_OPTS
+  artifacts:
+    paths:
+      - target/
+
+docker-build:
+  stage: docker
+  script: 
+    - docker build -t registry.gitlab.com/thukabjj/$REPO .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push registry.gitlab.com/thukabjj/$REPO

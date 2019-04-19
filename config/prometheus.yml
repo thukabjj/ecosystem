@@ -1,0 +1,15 @@
+scrape_configs:
+  - job_name: 'prometheus-docker-container'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: 'spring-boot-docker-container'
+    scrape_interval: 1m
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['spring-boot-docker-container:8080']
+  - job_name: 'grafana-docker-container'
+    scrape_interval: 1m
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['grafana-docker-container:3000']

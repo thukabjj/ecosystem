@@ -27,8 +27,8 @@ public class Swagger {
 	}
 	private ApiInfo metaData() {
 		return new ApiInfoBuilder()
-		.title("Ecosystem - Cadastro")
-		.description("\"Projeto que centraliza todos os cadastros referentes ao ecosystem\"")
+		.title("Ingresse RESTFul API")
+		.description("\"Documentation of the Ingress API v1\"")
 		.version("1.0.0")
 		.build();
 		}

@@ -1,0 +1,97 @@
+version: '3.7'
+services:
+
+  mysql-docker-container:
+    image: mysql:5.6
+    environment:
+      - MYSQL_ROOT_PASSWORD=EcosystemRootPassword
+      - MYSQL_DATABASE=ecosystemDb
+      - MYSQL_USER=arthur
+      - MYSQL_PASSWORD=DBArootPassword
+      - MYSQL_ONETIME_PASSWORD=true
+    volumes:
+      - /opt/mysql_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    expose:
+      - "3306"
+    healthcheck:
+      test:  mysql --user=arthur --password=DBArootPassword -e 'SHOW DATABASES;'
+    restart:  on-failure:5 
+    networks:
+      spring-cloud-network:
+        aliases:  
+          - mysql-docker-container
+
+  spring-boot-docker-container:
+    command: ["mvn install"] 
+    build: .
+    depends_on:
+      - mysql-docker-container
+    links:
+      - mysql-docker-container:mysql-docker-container
+    ports:
+      - 8080:8080
+    expose:
+      - "8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-docker-container:3306/ecosystemDb?useTimezone=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=arthur
+      - SPRING_DATASOURCE_PASSWORD=DBArootPassword
+    healthcheck:
+      test: ["CMD","http://localhost:8080/actuator/health"]
+    restart: on-failure:5 
+    networks:
+      spring-cloud-network:
+        aliases: 
+          - spring-boot-docker-container
+
+  nginx-docker-container:
+    image: 
+      nginx:1.13
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./config/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - spring-boot-docker-container
+    restart: on-failure:5 
+    networks:
+      spring-cloud-network:
+        aliases: 
+          - nginx-docker-container
+
+  grafana-docker-container:
+      image: grafana/grafana:5.4.3
+      ports:
+        - 3000:3000
+      volumes:
+        - ./grafana:/var/lib/grafana
+      environment:
+        - GF_SECURITY_ADMIN_USER=admin
+        - GF_SECURITY_ADMIN_PASSWORD=password
+      depends_on:
+      - spring-boot-docker-container
+      restart: on-failure:5 
+      networks:
+        spring-cloud-network:
+          aliases:
+            - grafana-docker-container
+
+  prometheus-docker-container:
+      image: prom/prometheus:v2.6.1
+      ports:
+        - 9090:9090
+      volumes:
+        - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+        - ./prometheus:/prometheus
+      restart: on-failure:5 
+      depends_on:
+      - spring-boot-docker-container
+      networks:
+         spring-cloud-network:
+          aliases:
+            - prometheus-docker-container
+networks:
+    spring-cloud-network:
