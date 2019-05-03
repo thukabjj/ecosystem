@@ -1,4 +1,4 @@
-package br.com.ecosystem.configuration.swagger;
+package br.com.ecosystem.infra.swagger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +27,8 @@ public class Swagger {
 	}
 	private ApiInfo metaData() {
 		return new ApiInfoBuilder()
-		.title("Ingresse RESTFul API")
-		.description("\"Documentation of the Ingress API v1\"")
+		.title("Ecosystem RESTFul API")
+		.description("\"Documentation of the Ecosystem API v1\"")
 		.version("1.0.0")
 		.build();
 		}

@@ -1,10 +1,10 @@
-package br.com.ecosystem.application.service;
+package br.com.ecosystem.application;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
@@ -13,26 +13,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.ecosystem.configuration.repository.UserRepository;
-import br.com.ecosystem.configuration.util.GsonUtil;
-import br.com.ecosystem.configuration.validation.CustomValidationException;
-import br.com.ecosystem.domain.entity.UserEntity;
-import br.com.ecosystem.domain.model.UserDto;
+import br.com.ecosystem.domain.user.UserEntity;
+import br.com.ecosystem.infra.repository.UserRepository;
+import br.com.ecosystem.infra.util.GsonUtil;
+import br.com.ecosystem.infra.validation.CustomValidationException;
 
 @Service
-@Transactional(rollbackOn = Exception.class)
 public class UserService {
 	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
 	@Autowired
 	private UserRepository userRepository;
 
-	public UserDto getUser(Long id) {
+	public UserEntity getUser(Long id) {
 		logger.debug("Start getUser. Entry: {} ",GsonUtil.getInstance(id));
-		UserDto response = new UserDto();
+		UserEntity response = null;
 		try {
 			Optional<UserEntity> userEntity = userRepository.findById(id);
-				if(Objects.nonNull(userEntity.get())) response = new UserDto(userEntity.get());
+				if(Objects.nonNull(userEntity.get())) response = userEntity.get();
 		} catch (Exception e) {
 			throw new CustomValidationException("There was an error on the method getUser",e);
 		} finally {
@@ -41,12 +39,11 @@ public class UserService {
 		return response;
 	}
 
-	public List<UserDto> getUsers() {
-		List<UserDto> response = new ArrayList<>();
+	public List<UserEntity> getUsers() {
 		logger.debug("Start getUsers.");
+		List<UserEntity> response = null;
 		try {
-			List<UserEntity> usersEntity = userRepository.findAll();
-			usersEntity.stream().forEach(e -> response.add(new UserDto(e)));
+			response = userRepository.findAll();
 		} catch (Exception e) {
 			throw new CustomValidationException("There was an error on the method getUsers",e);
 		}finally {
@@ -54,19 +51,13 @@ public class UserService {
 		}
 		return response;
 	}
-
-	public UserDto saveUser(@Valid UserDto userDto) {
-		logger.debug("Start saveUser. Entry: {} ",GsonUtil.getInstance(userDto));
-		UserDto response = new UserDto();
+	
+	@Transactional(rollbackOn = {PersistenceException.class})
+	public UserEntity saveUser(@Valid UserEntity request) {
+		logger.debug("Start saveUser. Entry: {} ",GsonUtil.getInstance(request));
+		UserEntity response = null;
 		try {
-			UserEntity entity = new UserEntity();
-			entity.setEmail(userDto.getEmail());
-			entity.setLogin(userDto.getLogin());
-			entity.setName(userDto.getName());
-			entity.setPassword(userDto.getPassword());
-			entity = userRepository.saveAndFlush(entity);
-			response = new UserDto(entity);
-
+			response = userRepository.saveAndFlush(request);
 		} catch (Exception e) {
 			throw new CustomValidationException("There was an error on the method saveUser",e);
 		} finally {
@@ -74,19 +65,13 @@ public class UserService {
 		}
 		return response;
 	}
-
-	public UserDto updateUser(@Valid UserDto userDto) {
-		logger.debug("Start updateUser. Entry: {} ",GsonUtil.getInstance(userDto));
-		UserDto response = new UserDto();
+	
+	@Transactional(rollbackOn = {PersistenceException.class})
+	public UserEntity updateUser(@Valid UserEntity request) {
+		logger.debug("Start updateUser. Entry: {} ",GsonUtil.getInstance(request));
+		UserEntity response = null;
 		try {
-			UserEntity entity = new UserEntity();
-			entity.setId(userDto.getId());
-			entity.setEmail(userDto.getEmail());
-			entity.setLogin(userDto.getLogin());
-			entity.setName(userDto.getName());
-			entity.setPassword(userDto.getPassword());
-			entity = userRepository.saveAndFlush(entity);
-			response = new UserDto(entity);
+			response = userRepository.saveAndFlush(request);
 		} catch (Exception e) {
 			throw new CustomValidationException("There was an error on the method updateUser",e);
 		} finally {

@@ -1,4 +1,4 @@
-package br.com.ecosystem.configuration.validation;
+package br.com.ecosystem.infra.validation;
 
 import java.util.ArrayList;
 import java.util.List;

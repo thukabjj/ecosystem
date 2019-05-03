@@ -1,4 +1,4 @@
-package br.com.ecosystem.controller;
+package br.com.ecosystem.restApi;
 
 import java.util.List;
 
@@ -16,68 +16,64 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.ecosystem.application.business.UserBusiness;
-import br.com.ecosystem.configuration.util.GsonUtil;
-import br.com.ecosystem.domain.model.UserDto;
-import br.com.ecosystem.domain.model.UserRequestDto;
+import br.com.ecosystem.application.UserService;
+import br.com.ecosystem.domain.user.UserEntity;
+import br.com.ecosystem.infra.util.GsonUtil;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/ingresse/api/v1")
+@RequestMapping("/ecosystem/api/v1")
 public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	
 	@Autowired
-	private UserBusiness userBusiness;
+	private UserService userService;
 
 	@GetMapping("/users")
-	@ResponseBody
 	@ApiOperation(value = "Get list of users registred.")
-	public ResponseEntity<List<UserDto>> listUser() {
+	public ResponseEntity<List<UserEntity>> listUser() {
 		logger.info("Start listUser.");
-		List<UserDto> response = userBusiness.getListOfUsers();
+		List<UserEntity> response = userService.getUsers();
 		logger.info("Finish listUser. Response: {}",GsonUtil.getInstance(response));
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	@GetMapping("/users/{id}")
-	@ResponseBody
 	@ApiOperation(value = "Get users registred by id.")
-	public ResponseEntity<UserDto> getUser(@PathVariable(value = "id") Long id) {
+	public ResponseEntity<UserEntity> getUser(@PathVariable(value = "id") Long id) {
 		logger.info("Start getUser. Entry: {}",GsonUtil.getInstance(id));
-		UserDto response = userBusiness.getUser(id);
+		UserEntity response = userService.getUser(id);
 		logger.info("Finish getUser. Response {}",GsonUtil.getInstance(response));
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	@PostMapping("/users")
-	@ResponseBody
 	@ApiOperation(value = "Register user.")
-	public ResponseEntity<UserDto> registerUser(@RequestBody @Valid UserRequestDto userDto) {
-		logger.info("Start registerUser. Entry: {}",GsonUtil.getInstance(userDto));
-		UserDto response = userBusiness.registerUser(userDto);
+	public ResponseEntity<UserEntity> registerUser(@RequestBody @Valid UserEntity request) {
+		logger.info("Start registerUser. Entry: {}",GsonUtil.getInstance(request));
+		UserEntity response = userService.saveUser(request);
 		logger.info("Finish registerUser. Response {}",GsonUtil.getInstance(response));
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/users")
-	@ResponseBody
 	@ApiOperation(value = "Update user.")
-	public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UserDto userDto) {
-		logger.info("Start updateUser. Entry: {}",GsonUtil.getInstance(userDto));
-		UserDto response = userBusiness.updateUser(userDto);
-		logger.info("Finish updateUser. Response {}",GsonUtil.getInstance(userDto));
+	public ResponseEntity<UserEntity> updateUser(@RequestBody @Valid UserEntity request) {
+		logger.info("Start updateUser. Entry: {}",GsonUtil.getInstance(request));
+		UserEntity response = userService.updateUser(request);
+		logger.info("Finish updateUser. Response {}",GsonUtil.getInstance(request));
 		return ResponseEntity.ok(response);
 	}
+	
 	@ApiOperation(value = "Delete user.")
 	@DeleteMapping("/users/{id}")
-	public ResponseEntity<?> deleteUser(@PathVariable(value = "id") Long id) {
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteUser(@PathVariable(value = "id") Long id) {
 		logger.info("Start deleteUser. Entry: {}",GsonUtil.getInstance(id));
-		userBusiness.deleteUser(id);
+		userService.deleteUser(id);
 		logger.info("Finish deleteUser.");
-		return ResponseEntity.ok(HttpStatus.NO_CONTENT);
 	}
 
 }

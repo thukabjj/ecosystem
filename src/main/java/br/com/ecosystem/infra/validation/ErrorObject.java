@@ -1,4 +1,4 @@
-package br.com.ecosystem.configuration.validation;
+package br.com.ecosystem.infra.validation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
