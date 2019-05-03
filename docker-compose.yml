@@ -24,7 +24,7 @@ services:
           - mysql-docker-container
 
   spring-boot-docker-container:
-    command: ["mvn install"] 
+    # command: ["mvn install"] 
     build: .
     depends_on:
       - mysql-docker-container
@@ -46,52 +46,52 @@ services:
         aliases: 
           - spring-boot-docker-container
 
-  nginx-docker-container:
-    image: 
-      nginx:1.13
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./config/conf.d:/etc/nginx/conf.d
-    depends_on:
-      - spring-boot-docker-container
-    restart: on-failure:5 
-    networks:
-      spring-cloud-network:
-        aliases: 
-          - nginx-docker-container
+  # nginx-docker-container:
+  #   image: 
+  #     nginx:1.13
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   volumes:
+  #     - ./config/conf.d:/etc/nginx/conf.d
+  #   depends_on:
+  #     - spring-boot-docker-container
+  #   restart: on-failure:5 
+  #   networks:
+  #     spring-cloud-network:
+  #       aliases: 
+  #         - nginx-docker-container
 
-  grafana-docker-container:
-      image: grafana/grafana:5.4.3
-      ports:
-        - 3000:3000
-      volumes:
-        - ./grafana:/var/lib/grafana
-      environment:
-        - GF_SECURITY_ADMIN_USER=admin
-        - GF_SECURITY_ADMIN_PASSWORD=password
-      depends_on:
-      - spring-boot-docker-container
-      restart: on-failure:5 
-      networks:
-        spring-cloud-network:
-          aliases:
-            - grafana-docker-container
+  # grafana-docker-container:
+  #     image: grafana/grafana:5.4.3
+  #     ports:
+  #       - 3000:3000
+  #     volumes:
+  #       - ./grafana:/var/lib/grafana
+  #     environment:
+  #       - GF_SECURITY_ADMIN_USER=admin
+  #       - GF_SECURITY_ADMIN_PASSWORD=password
+  #     depends_on:
+  #     - spring-boot-docker-container
+  #     restart: on-failure:5 
+  #     networks:
+  #       spring-cloud-network:
+  #         aliases:
+  #           - grafana-docker-container
 
-  prometheus-docker-container:
-      image: prom/prometheus:v2.6.1
-      ports:
-        - 9090:9090
-      volumes:
-        - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
-        - ./prometheus:/prometheus
-      restart: on-failure:5 
-      depends_on:
-      - spring-boot-docker-container
-      networks:
-         spring-cloud-network:
-          aliases:
-            - prometheus-docker-container
+  # prometheus-docker-container:
+  #     image: prom/prometheus:v2.6.1
+  #     ports:
+  #       - 9090:9090
+  #     volumes:
+  #       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+  #       - ./prometheus:/prometheus
+  #     restart: on-failure:5 
+  #     depends_on:
+  #     - spring-boot-docker-container
+  #     networks:
+  #        spring-cloud-network:
+  #         aliases:
+  #           - prometheus-docker-container
 networks:
     spring-cloud-network:
