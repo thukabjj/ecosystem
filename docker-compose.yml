@@ -2,7 +2,8 @@ version: '3.7'
 services:
 
   mysql-docker-container:
-    image: mysql:5.6
+    image: 
+      mysql:5.6
     environment:
       - MYSQL_ROOT_PASSWORD=EcosystemRootPassword
       - MYSQL_DATABASE=ecosystemDb
@@ -24,7 +25,6 @@ services:
           - mysql-docker-container
 
   spring-boot-docker-container:
-    command: ["mvn","install"] 
     build: .
     depends_on:
       - mysql-docker-container
@@ -63,7 +63,8 @@ services:
           - nginx-docker-container
 
   grafana-docker-container:
-      image: grafana/grafana:5.4.3
+      image: 
+        grafana/grafana:5.4.3
       ports:
         - 3000:3000
       volumes:
@@ -80,7 +81,8 @@ services:
             - grafana-docker-container
 
   prometheus-docker-container:
-      image: prom/prometheus:v2.6.1
+      image: 
+        prom/prometheus:v2.6.1
       ports:
         - 9090:9090
       volumes:
