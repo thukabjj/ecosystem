@@ -24,7 +24,7 @@ services:
           - mysql-docker-container
 
   spring-boot-docker-container:
-    # command: ["mvn install"] 
+    command: ["mvn","install"] 
     build: .
     depends_on:
       - mysql-docker-container
