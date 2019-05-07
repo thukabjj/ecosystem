@@ -30,7 +30,11 @@ public class CustomValidationException extends DefaultGlobalException {
 		this.message = message;
 		this.httpStatus = httpStatus;
 	}
-
+	public CustomValidationException(String message, Throwable cause) {
+		super(message, cause);
+		this.message = message;
+		this.httpStatus = HttpStatus.BAD_REQUEST;
+	}
 	public CustomValidationException(String message, Throwable cause, HttpStatus httpStatus) {
 		super(message, cause);
 		this.message = message;

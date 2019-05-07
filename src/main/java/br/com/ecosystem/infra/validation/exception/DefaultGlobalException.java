@@ -20,10 +20,12 @@ public abstract class DefaultGlobalException extends RuntimeException {
 	public DefaultGlobalException(String message) {
 		super(message);
 		this.message = message;
+		this.httpStatus = HttpStatus.BAD_REQUEST;
 	}
 
 	public DefaultGlobalException(String message, Throwable cause) {
 		super(message, cause);
 		this.message = message;
+		this.httpStatus = HttpStatus.BAD_REQUEST;
 	}
 }
