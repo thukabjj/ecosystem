@@ -1,4 +1,4 @@
-# Ecosystem
+# ECOSYSTEM
 -------------------
 Objective of this project
 -------------------
